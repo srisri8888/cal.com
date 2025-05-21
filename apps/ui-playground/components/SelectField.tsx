@@ -1,31 +1,21 @@
 import React from 'react';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { 
   FormControl, 
-  Select, 
-  MenuItem, 
-  FormHelperText,
-  SelectChangeEvent,
-  InputLabel
+  FormHelperText
 } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
 
-interface Option {
-  value: string;
-  label: string;
-}
-
-interface SelectFieldProps {
+interface DatePickerFieldProps {
   name: string;
   label: string;
-  options: Option[];
   required?: boolean;
   helperText?: string;
 }
 
-const SelectField: React.FC<SelectFieldProps> = ({
+const DatePickerField: React.FC<DatePickerFieldProps> = ({
   name,
   label,
-  options,
   required = false,
   helperText,
 }) => {
@@ -33,76 +23,60 @@ const SelectField: React.FC<SelectFieldProps> = ({
   const errorMessage = errors[name]?.message as string | undefined;
 
   return (
-    <Controller
-      name={name}
-      control={control}
-      rules={{
-        required: required ? 'This field is required' : false,
-      }}
-      render={({ field }) => (
-        <FormControl 
-          fullWidth 
-          error={!!errorMessage}
-          variant="outlined"
-          sx={{ 
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                transition: 'border-color 0.2s ease-in-out',
-              },
-              '&:hover fieldset': {
-                borderColor: 'primary.main',
-              },
-            }
-          }}
-        >
-          <InputLabel>{label}</InputLabel>
-          <Select
-            label={label}
+    <FormControl 
+      fullWidth 
+      error={!!errorMessage}
+    >
+      <Controller
+        name={name}
+        control={control}
+        rules={{
+          required: required ? 'This field is required' : false,
+        }}
+        render={({ field }) => (
+          <DatePicker
             value={field.value}
-            onChange={(e: SelectChangeEvent<string>) => {
-              field.onChange(e.target.value);
+            onChange={(newValue) => {
+              field.onChange(newValue);
             }}
-            MenuProps={{
-              PaperProps: {
-                elevation: 2,
-                sx: { 
-                  maxHeight: 300,
-                  borderRadius: 1,
-                  mt: 0.5
-                }
-              }
-            }}
-          >
-            {options.map((option) => (
-              <MenuItem 
-                key={option.value} 
-                value={option.value}
-                sx={{ 
-                  py: 1,
-                  transition: 'background-color 0.2s ease',
-                  '&:hover': {
-                    backgroundColor: 'action.hover',
-                  },
-                  '&.Mui-selected': {
-                    backgroundColor: 'primary.lighter',
-                    '&:hover': {
-                      backgroundColor: 'primary.light',
+            slotProps={{
+              textField: {
+                variant: 'outlined',
+                error: !!errorMessage,
+                fullWidth: true,
+                label,
+                sx: {
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      transition: 'border-color 0.2s ease-in-out',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'primary.main',
                     },
                   }
-                }}
-              >
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-          <FormHelperText>
-            {errorMessage || helperText}
-          </FormHelperText>
-        </FormControl>
-      )}
-    />
+                }
+              },
+              day: {
+                sx: {
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.main',
+                    '&:hover': {
+                      backgroundColor: 'primary.dark',
+                    },
+                  },
+                  borderRadius: '50%',
+                  transition: 'background-color 0.2s ease',
+                }
+              },
+            }}
+          />
+        )}
+      />
+      <FormHelperText>
+        {errorMessage || helperText}
+      </FormHelperText>
+    </FormControl>
   );
 };
 
-
-export default SelectField;
+export default DatePickerField;
